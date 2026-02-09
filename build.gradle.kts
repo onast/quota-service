@@ -11,13 +11,6 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    testImplementation(kotlin("test"))
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
 kotlin {
     jvmToolchain(23)
 }
@@ -48,4 +41,8 @@ tasks.test {
     testLogging {
         events("passed", "skipped", "failed")
     }
+}
+
+application {
+    mainClass.set("org.onast.example.quotaservice.ApplicationKt")
 }

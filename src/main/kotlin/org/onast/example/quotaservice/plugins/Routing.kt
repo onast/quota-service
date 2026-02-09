@@ -19,7 +19,10 @@ private val quotaService = QuotaService(policy = quotaPolicy)
 
 private val logger = LoggerFactory.getLogger("Routing")
 
-fun Application.configureRouting() {
+fun Application.configureRouting(
+    quotaService: QuotaService,
+    quotaPolicy: QuotaPolicy
+) {
     routing {
         get("/health") {
             call.respond(mapOf("status" to "ok"))
@@ -35,9 +38,10 @@ fun Application.configureRouting() {
             logger.info("consume apiKey={}, units={}", apiKey, req.units)
             val decision = quotaService.consume(apiKey = apiKey, units = req.units)
 
+            // common headers
+            call.response.headers.append("X-Quota-Limit", quotaPolicy.limitUnits.toString())
             when (decision) {
                 is QuotaDecision.Accepted -> {
-                    call.response.headers.append("X-Quota-Limit", quotaPolicy.limitUnits.toString())
                     call.response.headers.append("X-Quota-Remaining", decision.remaining.toString())
                     call.response.headers.append("X-Quota-Reset-Millis", decision.resetAtMs.toString())
                     call.respond(
@@ -46,7 +50,6 @@ fun Application.configureRouting() {
                     )
                 }
                 is QuotaDecision.Rejected -> {
-                    call.response.headers.append("X-Quota-Limit", quotaPolicy.limitUnits.toString())
                     call.response.headers.append("X-Quota-Remaining", decision.remaining.toString())
                     call.response.headers.append("X-Quota-Reset-Millis", decision.resetAtMs.toString())
                     call.respond(

@@ -7,6 +7,8 @@ import org.onast.example.quotaservice.plugins.configureLogging
 import org.onast.example.quotaservice.plugins.configureRouting
 import org.onast.example.quotaservice.plugins.configureSerialization
 import org.onast.example.quotaservice.plugins.configureStatusPages
+import org.onast.example.quotaservice.quota.QuotaPolicy
+import org.onast.example.quotaservice.quota.QuotaService
 
 fun main() {
     embeddedServer(
@@ -21,5 +23,8 @@ fun Application.module() {
     configureLogging()
     configureSerialization()
     configureStatusPages()
-    configureRouting()
+
+    val policy = QuotaPolicy(limitUnits = 100, windowMs = 60 * 60 * 1000L)
+    val service = QuotaService(policy)
+    configureRouting(service, policy)
 }
