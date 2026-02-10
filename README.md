@@ -150,12 +150,17 @@ The project includes:
 
 ### Concurrency test
 
-Simulates many parallel requests to verify:
+Concurrency is validated at the **service layer** by simulating many parallel
+`consume()` calls for the same API key.
 
-* **Accepted requests never exceed quota**
-* **All requests accounted for**
+The test verifies that:
 
-This validates **thread-safety and correctness**, which is a key requirement of the task.
+- Accepted requests never exceed the configured quota
+- All requests are correctly accounted for
+
+This confirms **thread-safety and correctness of the core quota algorithm**,
+which is the primary concurrency risk in this system.
+
 
 ---
 
@@ -212,16 +217,3 @@ For a production-grade system, I would add:
 * **Metrics & monitoring** (Prometheus, dashboards)
 * **Authentication & audit logging**
 * **Configuration externalization**
-
----
-
-## Summary
-
-This implementation focuses on:
-
-* **Correctness under concurrency**
-* **Clear, maintainable Kotlin code**
-* **Minimal but sound architecture**
-* **Thoughtful trade-offs within MVP constraints**
-
-It is intentionally simple while demonstrating how the service could evolve into a **production-ready distributed quota system**.
